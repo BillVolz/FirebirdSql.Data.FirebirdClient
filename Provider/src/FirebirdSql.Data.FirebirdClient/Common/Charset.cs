@@ -62,7 +62,7 @@ namespace FirebirdSql.Data.Common
 		{
 			var charsets = new List<Charset>();
 
-			charsets.Add(new Charset(0, None, 1, None));
+			charsets.Add(new Charset(0, None, 3, "UTF-8"));
 			charsets.Add(new Charset(1, Octets, 1, Octets));
 			charsets.Add(new Charset(2, "ASCII", 1, "ascii"));
 			charsets.Add(new Charset(3, "UNICODE_FSS", 3, "UTF-8"));

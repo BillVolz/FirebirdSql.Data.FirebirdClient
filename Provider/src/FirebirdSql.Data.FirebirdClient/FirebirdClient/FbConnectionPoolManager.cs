@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using FirebirdSql.Data.Common;
@@ -111,7 +112,9 @@ namespace FirebirdSql.Data.FirebirdClient
 				lock (_syncRoot)
 				{
 					CheckDisposedImpl();
-
+#if DEBUG
+					Debug.WriteLine($"{_busy.Count} busy, {_available.Count} available.");
+#endif
 					var now = GetTicks();
 					var available = _available.ToList();
 					if (available.Count() <= _connectionString.MinPoolSize)
@@ -175,6 +178,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		int _disposed;
 		ConcurrentDictionary<string, Pool> _pools;
 		Timer _cleanupTimer;
+		private bool _cleanupRunning;
 
 		static FbConnectionPoolManager()
 		{
@@ -186,6 +190,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			_disposed = 0;
 			_pools = new ConcurrentDictionary<string, Pool>();
+			_cleanupRunning = false;
 			_cleanupTimer = new Timer(CleanupCallback, null, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2));
 		}
 
@@ -234,7 +239,19 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		void CleanupCallback(object o)
 		{
-			_pools.Values.AsParallel().ForAll(x => x.CleanupPool());
+			if (_cleanupRunning)
+				return;
+			_cleanupRunning=true;
+
+			try
+			{
+				_pools.Values.AsParallel().ForAll(x => x.CleanupPool());
+			}
+			finally
+			{
+				_cleanupRunning = false;
+			}
+			
 		}
 
 		void CheckDisposed()

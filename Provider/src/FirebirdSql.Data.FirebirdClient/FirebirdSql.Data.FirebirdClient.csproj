@@ -18,6 +18,9 @@
 		<Title>Firebird ADO.NET Data provider</Title>
 		<PackageDescription>Firebird ADO.NET data provider</PackageDescription>
 		<PackageTags>firebird;firebirsql;firebirdclient;adonet;database</PackageTags>
+		<AssemblyVersion>7.5.0.0</AssemblyVersion>
+		<FileVersion>7.5.0.0</FileVersion>
+		<Authors>FirebirdSQL, sl</Authors>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>TRACE</DefineConstants>
